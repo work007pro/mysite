@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      line-height: 1.8;
+      min-height: 100vh;
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+      animation: drift 20s ease-in-out infinite;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2%, 2%); }
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+    }
+
+    .name {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #e0e0e0, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      color: #8888aa;
+      margin-top: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #6366f1;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #222;
+    }
+
+    .section p {
+      color: #aaa;
+      font-size: 1rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      padding: 0.4rem 1rem;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: #bbb;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .tag:hover {
+      border-color: #6366f1;
+      color: #e0e0e0;
+    }
+
+    .skills {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-card {
+      padding: 1.2rem;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 12px;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-2px);
+      border-color: #6366f1;
+    }
+
+    .skill-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .skill-card p {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .links a:hover {
+      border-color: #6366f1;
+      color: #fff;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #444;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 480px) {
+      .name { font-size: 1.8rem; }
+      .content { padding: 2rem 1.2rem; }
+      .skills { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="avatar">S</div>
+    <h1 class="name">Sub</h1>
+    <p class="title">Web Developer</p>
+  </section>
+
+  <main class="content">
+
+    <section class="section">
+      <h2 class="section-title">About</h2>
+      <p>
+        こんにちは。Webアプリケーションの設計・開発を行っているエンジニアです。
+        シンプルで使いやすいプロダクトを作ることを大切にしています。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Skills</h2>
+      <div class="skills">
+        <div class="skill-card">
+          <h3>Frontend</h3>
+          <p>HTML / CSS / JavaScript / React</p>
+        </div>
+        <div class="skill-card">
+          <h3>Backend</h3>
+          <p>Node.js / Python / Go</p>
+        </div>
+        <div class="skill-card">
+          <h3>Infrastructure</h3>
+          <p>Docker / AWS / CI/CD</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Hobbies</h2>
+      <div class="tags">
+        <span class="tag">Photography</span>
+        <span class="tag">Coffee</span>
+        <span class="tag">Reading</span>
+        <span class="tag">Travel</span>
+        <span class="tag">Music</span>
+        <span class="tag">Gaming</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Links</h2>
+      <div class="links">
+        <a href="https://github.com/sub" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://twitter.com/" target="_blank" rel="noopener">X (Twitter)</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    &copy; 2026 Sub. All rights reserved.
+  </footer>
+
+</body>
+</html>
