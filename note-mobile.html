@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Note Manager - Mobile</title>
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#242833;--bd:#2d3142;--tx:#e4e6ed;--txd:#8b8fa3;--pri:#6366f1;--ok:#10b981;--warn:#f59e0b;--err:#ef4444;--info:#3b82f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased}
+.header{padding:20px 16px 14px;text-align:center;border-bottom:1px solid var(--bd)}
+.header h1{font-size:18px;background:linear-gradient(135deg,var(--pri),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header small{color:var(--txd);font-size:11px}
+.wrap{padding:16px;max-width:480px;margin:0 auto}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.stat .l{font-size:13px;color:var(--txd)}
+.stat .v{font-size:22px;font-weight:700}
+.stat.wide{grid-column:1/-1}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:14px;gap:0}
+.tab{flex:1;text-align:center;padding:10px 0;font-size:13px;color:var(--txd);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.on{color:var(--pri);border-bottom-color:var(--pri)}
+.tc{display:none}.tc.on{display:block}
+.acc-item{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px}
+.acc-item .name{font-weight:600;font-size:14px;margin-bottom:2px}
+.acc-item .theme{font-size:11px;color:var(--txd);margin-bottom:6px}
+.acc-item .meta{display:flex;gap:10px;font-size:11px;color:var(--txd);flex-wrap:wrap}
+.acc-item .meta span{display:flex;align-items:center;gap:3px}
+.art-item{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:8px}
+.art-item .title{font-size:14px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.art-item .foot{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--txd)}
+.badge{display:inline-block;padding:2px 7px;border-radius:12px;font-size:10px;font-weight:500}
+.b-ok{background:rgba(16,185,129,.15);color:var(--ok)}.b-w{background:rgba(245,158,11,.15);color:var(--warn)}.b-e{background:rgba(239,68,68,.15);color:var(--err)}.b-i{background:rgba(59,130,246,.15);color:var(--info)}.b-g{background:rgba(139,143,163,.15);color:var(--txd)}
+.paid-b{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.empty{text-align:center;padding:32px 0;color:var(--txd);font-size:13px}
+.empty .ic{font-size:32px;margin-bottom:8px}
+.refresh{display:block;margin:16px auto;padding:8px 20px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:12px;cursor:pointer;font-family:inherit}
+.pc-link{text-align:center;padding:14px;margin-top:8px}
+.pc-link a{color:var(--pri);font-size:12px}
+.pull{text-align:center;padding:8px;font-size:11px;color:var(--txd);display:none}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Note Manager</h1>
+<small>モバイルビュー</small>
+</div>
+<div class="wrap">
+<!-- Stats -->
+<div class="stats">
+<div class="stat"><span class="l">アカウント</span><span class="v" style="color:var(--pri)" id="m-acc">0</span></div>
+<div class="stat"><span class="l">総記事数</span><span class="v" style="color:var(--info)" id="m-art">0</span></div>
+<div class="stat"><span class="l">投稿済み</span><span class="v" style="color:var(--ok)" id="m-pub">0</span></div>
+<div class="stat"><span class="l">予約済み</span><span class="v" style="color:var(--warn)" id="m-sch">0</span></div>
+<div class="stat wide"><span class="l">下書き</span><span class="v" style="color:var(--txd)" id="m-dra">0</span></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+<div class="tab on" onclick="mTab('t-acc',this)">アカウント</div>
+<div class="tab" onclick="mTab('t-pub',this)">投稿済み</div>
+<div class="tab" onclick="mTab('t-sch',this)">予約</div>
+<div class="tab" onclick="mTab('t-dra',this)">下書き</div>
+</div>
+
+<div id="t-acc" class="tc on"></div>
+<div id="t-pub" class="tc"></div>
+<div id="t-sch" class="tc"></div>
+<div id="t-dra" class="tc"></div>
+
+<button class="refresh" onclick="render()">&#128260; 更新</button>
+<div class="pc-link"><a href="note-manager.html">&#128187; PC版ダッシュボードを開く</a></div>
+</div>
+
+<script>
+const DB_KEY = 'note_manager_data';
+function loadDB() { const d = localStorage.getItem(DB_KEY); return d ? JSON.parse(d) : { accounts:[], articles:[] }; }
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function statusBadge(s) {
+    const m = {draft:['下書き','b-g'],scheduled:['予約済み','b-w'],published:['投稿完了','b-ok'],error:['エラー','b-e']};
+    const [l,c] = m[s]||[s,'b-g'];
+    return `<span class="badge ${c}">${l}</span>`;
+}
+
+function mTab(id, el) {
+    document.querySelectorAll('.tc').forEach(t => t.classList.remove('on'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+    document.getElementById(id).classList.add('on');
+    el.classList.add('on');
+}
+
+function render() {
+    const db = loadDB();
+    const arts = db.articles || [];
+    const accs = db.accounts || [];
+
+    // Stats
+    document.getElementById('m-acc').textContent = accs.length;
+    document.getElementById('m-art').textContent = arts.length;
+    document.getElementById('m-pub').textContent = arts.filter(a=>a.status==='published').length;
+    document.getElementById('m-sch').textContent = arts.filter(a=>a.status==='scheduled').length;
+    document.getElementById('m-dra').textContent = arts.filter(a=>a.status==='draft').length;
+
+    // Accounts
+    let ah = '';
+    if (accs.length) {
+        accs.forEach(a => {
+            const cnt = arts.filter(x=>x.accId===a.id).length;
+            const pub = arts.filter(x=>x.accId===a.id&&x.status==='published').length;
+            const freq = {daily:'毎日',every_other_day:'1日おき',weekdays:'平日',weekly:'週1',biweekly:'隔週',monthly:'月1'}[a.freq]||'';
+            ah += `<div class="acc-item"><div class="name">${esc(a.name)} <span class="badge b-ok" style="font-size:9px">OK</span></div>`;
+            if (a.theme) ah += `<div class="theme">&#127912; ${esc(a.theme)}</div>`;
+            ah += `<div class="meta"><span>&#128196; ${cnt}記事</span><span>&#9989; ${pub}投稿</span>`;
+            if (a.defPrice > 0) ah += `<span>&#128176; ¥${a.defPrice}</span>`;
+            if (freq) ah += `<span>&#128197; ${freq}</span>`;
+            ah += `</div></div>`;
+        });
+    } else { ah = '<div class="empty"><div class="ic">&#128100;</div>アカウント未登録</div>'; }
+    document.getElementById('t-acc').innerHTML = ah;
+
+    // Published
+    renderArtTab('t-pub', arts.filter(a=>a.status==='published').reverse(), accs);
+    // Scheduled
+    renderArtTab('t-sch', arts.filter(a=>a.status==='scheduled').reverse(), accs);
+    // Drafts
+    renderArtTab('t-dra', arts.filter(a=>a.status==='draft').reverse(), accs);
+}
+
+function renderArtTab(elId, arts, accs) {
+    let h = '';
+    if (arts.length) {
+        arts.forEach(a => {
+            const acc = accs.find(x=>x.id===a.accId);
+            h += `<div class="art-item"><div class="title">${esc(a.title||'(無題)')} ${a.isPaid?'<span class="paid-b">¥'+a.price+'</span>':''}</div><div class="foot"><span>${esc(acc?.name||'?')}</span><span>${a.date||'-'}</span></div></div>`;
+        });
+    } else { h = '<div class="empty"><div class="ic">&#128196;</div>記事なし</div>'; }
+    document.getElementById(elId).innerHTML = h;
+}
+
+render();
+// Auto refresh every 30s
+setInterval(render, 30000);
+</script>
+</body>
+</html>
