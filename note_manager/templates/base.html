@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Note Manager{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="app">
+        <button class="mobile-toggle" aria-label="メニュー">&#9776;</button>
+
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h1>Note Manager</h1>
+                <small>複数アカウント自動投稿</small>
+            </div>
+            <nav>
+                <a href="{{ url_for('dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'dashboard' }}">
+                    <span class="icon">&#128200;</span> ダッシュボード
+                </a>
+                <a href="{{ url_for('accounts') }}" class="nav-item {{ 'active' if request.endpoint in ('accounts', 'account_settings') }}">
+                    <span class="icon">&#128100;</span> アカウント管理
+                </a>
+                <a href="{{ url_for('articles') }}" class="nav-item {{ 'active' if request.endpoint == 'articles' }}">
+                    <span class="icon">&#128196;</span> 記事一覧
+                </a>
+                <a href="{{ url_for('new_article') }}" class="nav-item {{ 'active' if request.endpoint == 'new_article' }}">
+                    <span class="icon">&#9998;</span> 新規作成
+                </a>
+                <a href="{{ url_for('mobile_view') }}" class="nav-item {{ 'active' if request.endpoint == 'mobile_view' }}">
+                    <span class="icon">&#128241;</span> モバイルビュー
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

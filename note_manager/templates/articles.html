@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}記事一覧 - Note Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>&#128196; 記事一覧</h2>
+    <a href="{{ url_for('new_article') }}" class="btn btn-primary">&#9998; 新規作成</a>
+</div>
+
+<!-- Filter -->
+<div class="filter-bar">
+    <form action="{{ url_for('articles') }}" method="get" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <select name="status" onchange="this.form.submit()">
+            <option value="all" {{ 'selected' if status_filter == 'all' }}>全ステータス</option>
+            <option value="draft" {{ 'selected' if status_filter == 'draft' }}>下書き</option>
+            <option value="scheduled" {{ 'selected' if status_filter == 'scheduled' }}>予約済み</option>
+            <option value="published" {{ 'selected' if status_filter == 'published' }}>投稿完了</option>
+            <option value="error" {{ 'selected' if status_filter == 'error' }}>エラー</option>
+        </select>
+
+        <select name="account_id" onchange="this.form.submit()">
+            <option value="all" {{ 'selected' if account_filter == 'all' }}>全アカウント</option>
+            {% for acc in accounts %}
+            <option value="{{ acc.id }}" {{ 'selected' if account_filter|string == acc.id|string }}>{{ acc.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+{% if articles %}
+<div class="card" style="padding:0">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>タイトル</th>
+                    <th>アカウント</th>
+                    <th>種類</th>
+                    <th>ステータス</th>
+                    <th>日時</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td>
+                        <div style="max-width:300px">
+                            <strong>{{ article.title or '(無題)' }}</strong>
+                            {% if article.tag_list %}
+                            <div style="margin-top:4px">
+                                {% for tag in article.tag_list[:3] %}
+                                <span style="font-size:11px;color:var(--text-dim);background:var(--bg-input);padding:2px 6px;border-radius:4px">#{{ tag }}</span>
+                                {% endfor %}
+                                {% if article.tag_list|length > 3 %}
+                                <span style="font-size:11px;color:var(--text-dim)">+{{ article.tag_list|length - 3 }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="white-space:nowrap">{{ article.account.name }}</td>
+                    <td>
+                        {% if article.is_paid %}
+                            <span class="paid-badge">&#165;{{ article.price }}</span>
+                        {% else %}
+                            <span style="font-size:12px;color:var(--text-dim)">無料</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge" style="background:{{ article.status_color }}22;color:{{ article.status_color }}">
+                            {{ article.status_label }}
+                        </span>
+                    </td>
+                    <td style="font-size:13px;color:var(--text-dim);white-space:nowrap">
+                        {% if article.published_at %}
+                            {{ article.published_at.strftime('%Y/%m/%d %H:%M') }}
+                        {% elif article.scheduled_at %}
+                            {{ article.scheduled_at.strftime('%Y/%m/%d %H:%M') }}
+                        {% else %}
+                            {{ article.created_at.strftime('%Y/%m/%d %H:%M') }}
+                        {% endif %}
+                    </td>
+                    <td style="white-space:nowrap">
+                        <div style="display:flex;gap:4px">
+                            <a href="{{ url_for('edit_article', article_id=article.id) }}" class="btn btn-ghost btn-sm">編集</a>
+                            {% if article.note_url %}
+                            <a href="{{ article.note_url }}" target="_blank" class="btn btn-ghost btn-sm" style="color:var(--success)">&#128279;</a>
+                            {% endif %}
+                            <form id="delete-article-{{ article.id }}" action="{{ url_for('delete_article', article_id=article.id) }}" method="post" style="display:inline">
+                                <button type="button" class="btn btn-ghost btn-sm" style="color:var(--error)"
+                                        onclick="confirmDelete('delete-article-{{ article.id }}', '{{ article.title or \"この記事\" }}')">&#128465;</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="icon">&#128196;</div>
+        <p>{% if status_filter != 'all' or account_filter != 'all' %}該当する記事がありません{% else %}記事がまだありません{% endif %}</p>
+        <a href="{{ url_for('new_article') }}" class="btn btn-primary btn-sm">記事を作成</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

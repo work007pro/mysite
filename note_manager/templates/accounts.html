@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}アカウント管理 - Note Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>アカウント管理</h2>
+    <button class="btn btn-primary" onclick="openModal('add-account-modal')">&#10133; アカウント追加</button>
+</div>
+
+{% if accounts %}
+<div class="account-grid">
+    {% for account in accounts %}
+    <div class="account-card">
+        <div class="account-header">
+            <div>
+                <div class="account-name">{{ account.name }}</div>
+                <div class="account-email">{{ account.email }}</div>
+            </div>
+            {% if account.is_active %}
+                <span class="badge badge-success">接続済み</span>
+            {% else %}
+                <span class="badge badge-error">未接続</span>
+            {% endif %}
+        </div>
+
+        <div style="font-size:13px;color:var(--text-dim)">
+            {% if account.theme %}
+            <div style="margin-bottom:4px">&#127912; テーマ: <strong style="color:var(--text)">{{ account.theme }}</strong></div>
+            {% endif %}
+            <div style="margin-bottom:4px">&#128221; 文字数: {{ account.min_chars }}〜{{ account.max_chars }}文字</div>
+            {% if account.default_price > 0 %}
+            <div style="margin-bottom:4px">&#128176; 価格帯: &#165;{{ account.min_price }}〜&#165;{{ account.max_price }} (標準: &#165;{{ account.default_price }})</div>
+            {% endif %}
+            <div>&#128197; 頻度:
+                {% if account.post_frequency == 'daily' %}毎日
+                {% elif account.post_frequency == 'weekly' %}週1回
+                {% elif account.post_frequency == 'biweekly' %}隔週
+                {% elif account.post_frequency == 'monthly' %}月1回
+                {% else %}{{ account.post_frequency }}{% endif %}
+            </div>
+        </div>
+
+        <div class="account-meta">
+            <span>&#128196; 記事 {{ account.article_count }}</span>
+            <span>&#9989; 投稿済み {{ account.published_count }}</span>
+        </div>
+
+        <div class="account-actions">
+            <a href="{{ url_for('account_settings', account_id=account.id) }}" class="btn btn-outline btn-sm">&#9881; 設定</a>
+            <form action="{{ url_for('verify_account', account_id=account.id) }}" method="post" style="display:inline">
+                <button type="submit" class="btn btn-outline btn-sm">&#128274; 接続確認</button>
+            </form>
+            <form id="delete-account-{{ account.id }}" action="{{ url_for('delete_account', account_id=account.id) }}" method="post" style="display:inline">
+                <button type="button" class="btn btn-ghost btn-sm" style="color:var(--error)"
+                        onclick="confirmDelete('delete-account-{{ account.id }}', '{{ account.name }}')">&#128465; 削除</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="icon">&#128100;</div>
+        <p>まだアカウントが登録されていません。<br>note.comのアカウントを追加して始めましょう。</p>
+        <button class="btn btn-primary" onclick="openModal('add-account-modal')">アカウントを追加</button>
+    </div>
+</div>
+{% endif %}
+
+<!-- Add Account Modal -->
+<div id="add-account-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>&#128100; アカウント追加</h3>
+        <form action="{{ url_for('add_account') }}" method="post">
+            <div class="form-group">
+                <label>アカウント名（管理用）</label>
+                <input type="text" name="name" class="form-control" placeholder="例: メインアカウント" required>
+            </div>
+            <div class="form-group">
+                <label>note.com メールアドレス</label>
+                <input type="email" name="email" class="form-control" placeholder="example@email.com" required>
+            </div>
+            <div class="form-group">
+                <label>note.com パスワード</label>
+                <input type="password" name="password" class="form-control" required>
+                <div class="form-hint">パスワードは暗号化して保存されます</div>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px">
+                <button type="button" class="btn btn-outline" onclick="closeModal('add-account-modal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary">追加</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

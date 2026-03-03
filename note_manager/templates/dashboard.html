@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block title %}ダッシュボード - Note Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>ダッシュボード</h2>
+    <a href="{{ url_for('new_article') }}" class="btn btn-primary">&#9998; 新規記事作成</a>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">アカウント数</div>
+        <div class="value primary" id="stat-accounts">{{ stats.total_accounts }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">総記事数</div>
+        <div class="value info" id="stat-articles">{{ stats.total_articles }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">投稿済み</div>
+        <div class="value success" id="stat-published">{{ stats.published }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">予約済み</div>
+        <div class="value warning" id="stat-scheduled">{{ stats.scheduled }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">下書き</div>
+        <div class="value" id="stat-drafts" style="color: var(--text-dim)">{{ stats.draft }}</div>
+    </div>
+</div>
+
+<!-- Account Overview -->
+<div class="card">
+    <div class="card-header">
+        <h3>アカウント概要</h3>
+        <a href="{{ url_for('accounts') }}" class="btn btn-outline btn-sm">全て見る</a>
+    </div>
+    {% if accounts %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>アカウント名</th>
+                    <th>テーマ</th>
+                    <th>記事数</th>
+                    <th>投稿済み</th>
+                    <th>投稿頻度</th>
+                    <th>ステータス</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>
+                        <strong>{{ account.name }}</strong>
+                        <div style="font-size:12px;color:var(--text-dim)">{{ account.email }}</div>
+                    </td>
+                    <td>{{ account.theme or '未設定' }}</td>
+                    <td>{{ account.article_count }}</td>
+                    <td>{{ account.published_count }}</td>
+                    <td>
+                        {% if account.post_frequency == 'daily' %}毎日
+                        {% elif account.post_frequency == 'weekly' %}週1回
+                        {% elif account.post_frequency == 'biweekly' %}隔週
+                        {% elif account.post_frequency == 'monthly' %}月1回
+                        {% else %}{{ account.post_frequency }}{% endif %}
+                    </td>
+                    <td>
+                        {% if account.is_active %}
+                            <span class="badge badge-success">接続済み</span>
+                        {% else %}
+                            <span class="badge badge-error">未接続</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">&#128100;</div>
+        <p>アカウントが登録されていません</p>
+        <a href="{{ url_for('accounts') }}" class="btn btn-primary btn-sm">アカウントを追加</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recent Articles -->
+<div class="card">
+    <div class="card-header">
+        <h3>最近の記事</h3>
+        <a href="{{ url_for('articles') }}" class="btn btn-outline btn-sm">全て見る</a>
+    </div>
+    {% if articles %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>タイトル</th>
+                    <th>アカウント</th>
+                    <th>種類</th>
+                    <th>ステータス</th>
+                    <th>予約/投稿日時</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td>
+                        <strong>{{ article.title or '(無題)' }}</strong>
+                        {% if article.tag_list %}
+                        <div style="margin-top:4px">
+                            {% for tag in article.tag_list[:3] %}
+                            <span style="font-size:11px;color:var(--text-dim);background:var(--bg-input);padding:2px 6px;border-radius:4px">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>{{ article.account.name }}</td>
+                    <td>
+                        {% if article.is_paid %}
+                            <span class="paid-badge">&#165;{{ article.price }}</span>
+                        {% else %}
+                            <span style="font-size:12px;color:var(--text-dim)">無料</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge" style="background:{{ article.status_color }}22;color:{{ article.status_color }}">{{ article.status_label }}</span></td>
+                    <td style="font-size:13px;color:var(--text-dim)">
+                        {% if article.published_at %}
+                            {{ article.published_at.strftime('%Y/%m/%d %H:%M') }}
+                        {% elif article.scheduled_at %}
+                            {{ article.scheduled_at.strftime('%Y/%m/%d %H:%M') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('edit_article', article_id=article.id) }}" class="btn btn-ghost btn-sm">編集</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">&#128196;</div>
+        <p>記事がまだありません</p>
+        <a href="{{ url_for('new_article') }}" class="btn btn-primary btn-sm">記事を作成</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

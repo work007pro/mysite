@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+instance/
+*.db
+.encryption_key
+static/uploads/
+*.egg-info/
+.env

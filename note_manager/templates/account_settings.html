@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}{{ account.name }} 設定 - Note Manager{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>&#9881; {{ account.name }} の設定</h2>
+    <a href="{{ url_for('accounts') }}" class="btn btn-outline btn-sm">&#8592; アカウント一覧</a>
+</div>
+
+<form action="{{ url_for('save_account_settings', account_id=account.id) }}" method="post">
+
+    <!-- テーマ・コンテンツ設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#127912; コンテンツ設定</h4>
+            <div class="form-group">
+                <label>記事のテーマ / ジャンル</label>
+                <input type="text" name="theme" class="form-control" value="{{ account.theme }}" placeholder="例: プログラミング、投資、美容、料理">
+                <div class="form-hint">このアカウントで主に扱うテーマを設定します</div>
+            </div>
+            <div class="form-group">
+                <label>デフォルトタグ</label>
+                <input type="text" name="default_tags" class="form-control" value="{{ account.default_tags }}" placeholder="例: プログラミング, Python, AI">
+                <div class="form-hint">カンマ区切りで複数指定可</div>
+            </div>
+            <div class="form-group">
+                <label>文章のトーン / スタイル</label>
+                <input type="text" name="tone" class="form-control" value="{{ account.tone }}" placeholder="例: カジュアル、専門的、初心者向け">
+            </div>
+            <div class="form-group">
+                <label>ターゲット読者</label>
+                <input type="text" name="target_audience" class="form-control" value="{{ account.target_audience }}" placeholder="例: エンジニア初心者、副業を始めたい社会人">
+            </div>
+        </div>
+    </div>
+
+    <!-- 文字数設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#128221; 文字数設定</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>最小文字数</label>
+                    <input type="number" name="min_chars" class="form-control" value="{{ account.min_chars }}" min="100" step="100">
+                </div>
+                <div class="form-group">
+                    <label>最大文字数</label>
+                    <input type="number" name="max_chars" class="form-control" value="{{ account.max_chars }}" min="500" step="100">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 価格設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#128176; 価格設定</h4>
+            <div class="form-group">
+                <label>デフォルト価格（円）</label>
+                <input type="number" name="default_price" class="form-control" value="{{ account.default_price }}" min="0" max="50000" step="100">
+                <div class="form-hint">0の場合は無料記事がデフォルトになります</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>最小価格（円）</label>
+                    <input type="number" name="min_price" class="form-control" value="{{ account.min_price }}" min="100" max="50000" step="100">
+                </div>
+                <div class="form-group">
+                    <label>最大価格（円）</label>
+                    <input type="number" name="max_price" class="form-control" value="{{ account.max_price }}" min="100" max="50000" step="100">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 情報ソース設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#128269; 情報ソース設定</h4>
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px">記事作成時にリサーチする情報ソースを選択してください</p>
+
+            {% set current_sources = account.info_sources.split(',') if account.info_sources else [] %}
+
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_google" value="google" {{ 'checked' if 'google' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--primary)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(99,102,241,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#128270;</span> Google検索
+                </label>
+
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_youtube" value="youtube" {{ 'checked' if 'youtube' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--error)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(239,68,68,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#9654;</span> YouTube
+                </label>
+
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_news" value="news" {{ 'checked' if 'news' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--info)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(59,130,246,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#128240;</span> ニュース記事
+                </label>
+
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_wikipedia" value="wikipedia" {{ 'checked' if 'wikipedia' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--text-dim)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(139,143,163,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#128214;</span> Wikipedia
+                </label>
+
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_twitter" value="twitter" {{ 'checked' if 'twitter' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--info)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(59,130,246,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#128038;</span> X (Twitter)
+                </label>
+
+                <label class="source-btn" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg-input);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px">
+                    <input type="checkbox" name="info_source_academic" value="academic" {{ 'checked' if 'academic' in current_sources }} style="display:none"
+                           onchange="this.parentElement.style.borderColor=this.checked?'var(--success)':'var(--border)';this.parentElement.style.background=this.checked?'rgba(16,185,129,.1)':'var(--bg-input)';updateSources()">
+                    <span style="font-size:20px">&#127891;</span> 学術論文
+                </label>
+            </div>
+
+            <input type="hidden" name="info_sources" id="info-sources-hidden" value="{{ account.info_sources }}">
+        </div>
+    </div>
+
+    <!-- 画像設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#128248; 画像設定</h4>
+            <div class="form-group">
+                <div class="toggle-wrap">
+                    <label class="toggle">
+                        <input type="checkbox" name="auto_cover_image" {{ 'checked' if account.auto_cover_image }}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>表紙画像を自動生成する</span>
+                </div>
+                <div class="form-hint" style="margin-top:8px">記事タイトルから表紙画像を自動生成します</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 投稿スケジュール設定 -->
+    <div class="card">
+        <div class="settings-section">
+            <h4>&#128197; 投稿スケジュール</h4>
+            <div class="form-group">
+                <label>投稿頻度</label>
+                <select name="post_frequency" class="form-control">
+                    <option value="daily" {{ 'selected' if account.post_frequency == 'daily' }}>毎日</option>
+                    <option value="every_other_day" {{ 'selected' if account.post_frequency == 'every_other_day' }}>1日おき</option>
+                    <option value="weekdays" {{ 'selected' if account.post_frequency == 'weekdays' }}>平日のみ</option>
+                    <option value="weekly" {{ 'selected' if account.post_frequency == 'weekly' }}>週1回</option>
+                    <option value="biweekly" {{ 'selected' if account.post_frequency == 'biweekly' }}>隔週</option>
+                    <option value="monthly" {{ 'selected' if account.post_frequency == 'monthly' }}>月1回</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:8px">
+        <a href="{{ url_for('accounts') }}" class="btn btn-outline">キャンセル</a>
+        <button type="submit" class="btn btn-primary">&#128190; 設定を保存</button>
+    </div>
+</form>
+
+<script>
+// Initialize source button styles on load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.source-btn input[type="checkbox"]').forEach(cb => {
+        if (cb.checked) {
+            cb.parentElement.style.borderColor = 'var(--primary)';
+            cb.parentElement.style.background = 'rgba(99,102,241,.1)';
+        }
+    });
+});
+
+function updateSources() {
+    const sources = [];
+    document.querySelectorAll('.source-btn input[type="checkbox"]:checked').forEach(cb => {
+        sources.push(cb.value);
+    });
+    document.getElementById('info-sources-hidden').value = sources.join(',');
+}
+</script>
+{% endblock %}
